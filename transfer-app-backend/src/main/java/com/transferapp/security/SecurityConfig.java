@@ -32,9 +32,29 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService userDetailsService;
 
-    private static final String[] PUBLIC_ENDPOINTS = {
+    // Public API endpoints — no token required
+    private static final String[] PUBLIC_API_ENDPOINTS = {
             "/api/auth/login",
             "/api/auth/refresh"
+    };
+
+    // Angular static files and SPA routes — no token required
+    private static final String[] STATIC_RESOURCES = {
+            "/",
+            "/index.html",
+            "/login",
+            "/dashboard",
+            "/transfer",
+            "/history",
+            "/profile",
+            "/*.js",
+            "/*.css",
+            "/*.ico",
+            "/*.json",
+            "/*.txt",
+            "/*.map",
+            "/assets/**",
+            "/media/**"
     };
 
     @Bean
@@ -43,7 +63,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(PUBLIC_API_ENDPOINTS).permitAll()
+                        .requestMatchers(STATIC_RESOURCES).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -71,12 +92,17 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(Security.PASSWORD_ENCODER_STRENGTH);
     }
 
+    /**
+     * CORS configuration — mainly for local development (Angular on 4200, Spring Boot on 8080)
+     * Once frontend is served from the same origin (static files in Spring Boot), CORS issues disappear.
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
+
         config.setAllowedOrigins(List.of(
                 "http://localhost:4200",
-                "https://your-frontend.vercel.app"
+                "http://localhost:8080"
         ));
         config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization","Content-Type","Accept"));
