@@ -1,0 +1,24 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/transfer_app
+    username: postgres
+    password: ahmed123
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql: true
+
+application:
+  security:
+    jwt:
+      secret-key: dev-secret-key-change-in-production-123456789
+      expiration-ms: 86400000
+
+logging:
+  level:
+    com.transferapp: DEBUG
+

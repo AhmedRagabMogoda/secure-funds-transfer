@@ -1,0 +1,60 @@
+# ── Java / Maven ──────────────────────────────────────────────
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+hs_err_pid*
+
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ── Spring Boot ───────────────────────────────────────────────
+application-prod.yml
+application-local.yml
+
+# ── Node / Angular ────────────────────────────────────────────
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+
+# ── Environment & Secrets ─────────────────────────────────────
+.env
+.env.*
+*.env
+secret.yml
+secrets.yml
+
+# ── IDEs ──────────────────────────────────────────────────────
+.idea/
+*.iml
+*.iws
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.classpath
+.project
+.settings/
+
+# ── OS ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Docker ────────────────────────────────────────────────────
+docker-compose.override.yml
+
+# ── Logs ──────────────────────────────────────────────────────
+logs/
+*.log
