@@ -1,0 +1,131 @@
+<app-navbar></app-navbar>
+
+<div class="history-container" @fadeSlideIn>
+
+  <!-- Page Header -->
+  <div class="page-header" @cardEnter>
+    <div class="header-text">
+      <h1><mat-icon>receipt_long</mat-icon> Transaction History</h1>
+      <p>View and filter all your financial activity</p>
+    </div>
+    <button mat-icon-button (click)="load()" matTooltip="Refresh" class="refresh-btn">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+
+  <!-- Filter Toggle -->
+  <div class="filter-row" @cardEnter>
+    <button class="filter-btn" [class.active]="activeFilter === 'ALL'" (click)="setFilter('ALL')">
+      <mat-icon>list_alt</mat-icon> All Transactions
+    </button>
+    <button class="filter-btn sent" [class.active]="activeFilter === 'SENT'" (click)="setFilter('SENT')">
+      <mat-icon>arrow_upward</mat-icon> Sent
+    </button>
+    <button class="filter-btn received" [class.active]="activeFilter === 'RECEIVED'" (click)="setFilter('RECEIVED')">
+      <mat-icon>arrow_downward</mat-icon> Received
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Loading transactions...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="error-state" *ngIf="!isLoading && error">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-stroked-button (click)="load()">Try Again</button>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && !error && paged?.content?.length === 0" @cardEnter>
+    <mat-icon>inbox</mat-icon>
+    <h3>No transactions found</h3>
+    <p>There are no {{ activeFilter === 'SENT' ? 'sent' : activeFilter === 'RECEIVED' ? 'received' : '' }} transactions yet.</p>
+  </div>
+
+  <!-- Transactions Table -->
+  <mat-card class="table-card" *ngIf="!isLoading && !error && paged && paged.content.length > 0" @cardEnter>
+
+    <!-- Summary Bar -->
+    <div class="summary-bar">
+      <span class="summary-text">
+        Showing {{ paged.content.length }} of {{ paged.totalElements }} transactions
+      </span>
+      <span class="page-info">Page {{ paged.currentPage + 1 }} of {{ paged.totalPages }}</span>
+    </div>
+
+    <table mat-table [dataSource]="paged.content" class="transactions-table" [@listStagger]="paged.content.length">
+
+      <!-- Date -->
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef>Date & Time</th>
+        <td mat-cell *matCellDef="let tx">
+          <div class="date-cell">
+            <span class="date-main">{{ tx.createdAt | date:'MMM d, y' }}</span>
+            <span class="date-time">{{ tx.createdAt | date:'h:mm a' }}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Direction -->
+      <ng-container matColumnDef="direction">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let tx">
+          <span class="direction-badge" [class.sent]="tx.direction === 'SENT'" [class.received]="tx.direction === 'RECEIVED'">
+            <mat-icon>{{ tx.direction === 'SENT' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+            {{ tx.direction }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Counterparty -->
+      <ng-container matColumnDef="counterparty">
+        <th mat-header-cell *matHeaderCellDef>Account</th>
+        <td mat-cell *matCellDef="let tx">
+          <div class="account-cell">
+            <span class="account-label">{{ tx.direction === 'SENT' ? 'To' : 'From' }}</span>
+            <span class="account-number mono">{{ counterparty(tx) }}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Amount -->
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef>Amount</th>
+        <td mat-cell *matCellDef="let tx">
+          <span class="amount-value" [class.debit]="tx.direction === 'SENT'" [class.credit]="tx.direction === 'RECEIVED'">
+            {{ tx.direction === 'SENT' ? '−' : '+' }}{{ tx.amount | currency:'USD':'symbol':'1.2-2' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Status -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let tx">
+          <span class="status-badge" [class.success]="tx.status === 'SUCCESS'" [class.failed]="tx.status === 'FAILED'">
+            <mat-icon>{{ tx.status === 'SUCCESS' ? 'check_circle' : 'cancel' }}</mat-icon>
+            {{ tx.status }}
+          </span>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+    </table>
+
+    <!-- Paginator -->
+    <mat-paginator
+      [length]="paged.totalElements"
+      [pageSize]="pageSize"
+      [pageIndex]="page"
+      [pageSizeOptions]="[5, 10, 20]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+
+  </mat-card>
+</div>

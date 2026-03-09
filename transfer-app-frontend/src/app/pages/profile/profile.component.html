@@ -1,0 +1,117 @@
+<app-navbar></app-navbar>
+
+<div class="profile-container" @fadeSlideIn>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Loading your profile...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="error-state" *ngIf="!isLoading && error">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+  </div>
+
+  <ng-container *ngIf="!isLoading && profile">
+
+    <!-- Hero Card -->
+    <mat-card class="hero-card" @cardEnter>
+      <div class="hero-inner">
+        <div class="avatar">{{ getInitials(profile.username) }}</div>
+        <div class="hero-info">
+          <h1>{{ profile.username }}</h1>
+          <span class="role-badge" [class]="getRoleBadgeClass(profile.role)">{{ profile.role }}</span>
+          <p class="member-since">Member since {{ profile.memberSince | date:'MMMM d, yyyy' }}</p>
+        </div>
+        <div class="hero-balance">
+          <div class="balance-label">Available Balance</div>
+          <div class="balance-amount">{{ profile.balance | currency:'USD':'symbol':'1.2-2' }}</div>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Stats Row -->
+    <div class="stats-row" @cardEnter>
+
+      <mat-card class="stat-card transactions">
+        <mat-icon>receipt_long</mat-icon>
+        <div class="stat-value">{{ profile.totalTransactionCount }}</div>
+        <div class="stat-label">Total Transactions</div>
+      </mat-card>
+
+      <mat-card class="stat-card sent">
+        <mat-icon>arrow_upward</mat-icon>
+        <div class="stat-value">{{ profile.totalSent | currency:'USD':'symbol':'1.0-0' }}</div>
+        <div class="stat-label">Total Sent</div>
+      </mat-card>
+
+      <mat-card class="stat-card received">
+        <mat-icon>arrow_downward</mat-icon>
+        <div class="stat-value">{{ profile.totalReceived | currency:'USD':'symbol':'1.0-0' }}</div>
+        <div class="stat-label">Total Received</div>
+      </mat-card>
+
+      <mat-card class="stat-card net" [class.positive]="netFlow >= 0" [class.negative]="netFlow < 0">
+        <mat-icon>{{ netFlow >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+        <div class="stat-value">{{ netFlow | currency:'USD':'symbol':'1.0-0' }}</div>
+        <div class="stat-label">Net Flow</div>
+      </mat-card>
+
+    </div>
+
+    <!-- Account Details -->
+    <mat-card class="details-card" @cardEnter>
+      <div class="details-header">
+        <mat-icon>account_balance_wallet</mat-icon>
+        <h2>Account Details</h2>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="detail-label">Username</span>
+          <span class="detail-value">{{ profile.username }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Account Number</span>
+          <span class="detail-value mono">{{ profile.accountNumber }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Role</span>
+          <span class="detail-value">
+            <span class="inline-badge" [class]="getRoleBadgeClass(profile.role)">{{ profile.role }}</span>
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Member Since</span>
+          <span class="detail-value">{{ profile.memberSince | date:'MMMM d, yyyy' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Current Balance</span>
+          <span class="detail-value balance-highlight">{{ profile.balance | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Total Activity</span>
+          <span class="detail-value">{{ profile.totalTransactionCount }} transactions</span>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Quick Actions -->
+    <mat-card class="actions-card" @cardEnter>
+      <h2>Quick Actions</h2>
+      <div class="actions-row">
+        <button mat-raised-button color="primary" (click)="goToTransfer()" class="action-btn">
+          <mat-icon>swap_horiz</mat-icon>
+          New Transfer
+        </button>
+        <button mat-stroked-button color="primary" (click)="goToHistory()" class="action-btn">
+          <mat-icon>receipt_long</mat-icon>
+          View History
+        </button>
+      </div>
+    </mat-card>
+
+  </ng-container>
+</div>

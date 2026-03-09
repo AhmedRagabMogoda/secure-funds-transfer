@@ -1,0 +1,25 @@
+<mat-toolbar class="navbar">
+  <div class="brand" (click)="go('/dashboard')">
+    <mat-icon>account_balance</mat-icon>
+    <span>SecureTransfer</span>
+  </div>
+  <span class="spacer"></span>
+  <nav class="nav-links">
+    <button mat-button class="nav-btn" [class.active]="isActive('/dashboard')" (click)="go('/dashboard')">
+      <mat-icon>dashboard</mat-icon> Dashboard
+    </button>
+    <button mat-button class="nav-btn" [class.active]="isActive('/transfer')" (click)="go('/transfer')">
+      <mat-icon>swap_horiz</mat-icon> Transfer
+    </button>
+    <button mat-button class="nav-btn" [class.active]="isActive('/history')" (click)="go('/history')">
+      <mat-icon>receipt_long</mat-icon> History
+    </button>
+    <button mat-button class="nav-btn" [class.active]="isActive('/profile')" (click)="go('/profile')">
+      <mat-icon>person</mat-icon> Profile
+    </button>
+  </nav>
+  <span class="role-badge" [class.admin]="role === 'ADMIN'">{{ role }}</span>
+  <button mat-icon-button (click)="logout()" matTooltip="Logout">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>

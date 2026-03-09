@@ -1,0 +1,146 @@
+<app-navbar></app-navbar>
+
+<div class="transfer-container">
+  <div class="transfer-layout">
+
+    <!-- Left: Transfer Form -->
+    <mat-card class="transfer-card">
+      <div class="card-header">
+        <mat-icon>swap_horiz</mat-icon>
+        <h2>Send Money</h2>
+      </div>
+
+      <mat-card-content>
+
+        <!-- Account Balance Summary -->
+        <div class="balance-summary" *ngIf="account">
+          <div class="balance-row">
+            <span class="balance-label">Your Account</span>
+            <span class="balance-value mono">{{ account.accountNumber }}</span>
+          </div>
+          <div class="balance-row">
+            <span class="balance-label">Available Balance</span>
+            <span class="balance-amount">
+              {{ account.balance | currency: 'USD' : 'symbol' : '1.2-2' }}
+            </span>
+          </div>
+        </div>
+
+        <mat-divider class="divider"></mat-divider>
+
+        <!-- Transfer Form -->
+        <form [formGroup]="transferForm" (ngSubmit)="onSubmit()" novalidate>
+
+          <!-- Receiver Account Number -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Receiver Account Number</mat-label>
+            <mat-icon matPrefix>account_circle</mat-icon>
+            <input
+              matInput
+              formControlName="receiverAccountNumber"
+              placeholder="e.g. ACC-0000003"
+              autocomplete="off"
+            />
+            <mat-error *ngIf="receiverAccountNumber?.hasError('required')">
+              Receiver account number is required
+            </mat-error>
+            <mat-error *ngIf="receiverAccountNumber?.hasError('minlength')">
+              Please enter a valid account number
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Amount -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Amount (USD)</mat-label>
+            <mat-icon matPrefix>attach_money</mat-icon>
+            <input
+              matInput
+              type="number"
+              formControlName="amount"
+              placeholder="0.00"
+              min="0.01"
+              step="0.01"
+            />
+            <mat-error *ngIf="amount?.hasError('required')">
+              Amount is required
+            </mat-error>
+            <mat-error *ngIf="amount?.hasError('min')">
+              Amount must be greater than $0.00
+            </mat-error>
+          </mat-form-field>
+
+          <!-- API Error -->
+          <div class="error-alert" *ngIf="errorMessage">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+
+          <!-- Success Result -->
+          <div class="success-alert" *ngIf="transferResult">
+            <mat-icon>check_circle</mat-icon>
+            <div class="success-details">
+              <strong>Transfer Successful</strong>
+              <span>
+                {{ transferResult.amount | currency: 'USD' }}
+                sent to {{ transferResult.receiverAccountNumber }}
+              </span>
+              <span class="new-balance">
+                New Balance: {{ transferResult.newBalance | currency: 'USD' : 'symbol' : '1.2-2' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              class="submit-btn"
+              [disabled]="isSubmitting"
+            >
+              <mat-spinner *ngIf="isSubmitting" diameter="20" class="btn-spinner"></mat-spinner>
+              <mat-icon *ngIf="!isSubmitting">send</mat-icon>
+              <span>{{ isSubmitting ? 'Processing...' : 'Send Transfer' }}</span>
+            </button>
+
+            <button
+              mat-stroked-button
+              type="button"
+              class="back-btn"
+              (click)="goToDashboard()"
+            >
+              <mat-icon>arrow_back</mat-icon>
+              Back to Dashboard
+            </button>
+          </div>
+
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Right: Instructions Panel -->
+    <div class="info-panel">
+      <mat-card class="info-card">
+        <mat-icon class="info-icon">info_outline</mat-icon>
+        <h3>How It Works</h3>
+        <div class="info-steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-text">Enter the recipient's account number exactly as shown on their account.</div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-text">Specify the amount you wish to transfer. Your available balance will be checked automatically.</div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-text">Click Send Transfer. The transaction is processed instantly and cannot be reversed.</div>
+          </div>
+        </div>
+      </mat-card>
+
+    </div>
+
+  </div>
+</div>
