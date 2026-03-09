@@ -16,7 +16,7 @@ hs_err_pid*
 
 # ── Spring Boot ───────────────────────────────────────────────
 application-prod.yml
-application-local.yml
+application-dev.yml
 
 # ── Node / Angular ────────────────────────────────────────────
 node_modules/
