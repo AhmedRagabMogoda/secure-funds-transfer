@@ -55,7 +55,7 @@ RUN mvn dependency:go-offline -B
 # BEFORE the JAR is built so Angular files are embedded inside it.
 # Spring Boot serves everything in classpath:/static/ automatically.
 COPY --from=frontend-builder \
-     /frontend/dist/transfer-app-frontend/browser/ \
+     /frontend/dist/transfer-app-frontend/ \
      src/main/resources/static/
 
 # Copy backend source
