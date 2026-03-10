@@ -9,13 +9,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class SpaController {
 
-    @RequestMapping(value = "/{path:[^\\.]*}")
-    public String forwardToAngular() {
-        return "forward:/index.html";
-    }
-
-    @RequestMapping(value = "/{path:[^\\.]*}/{subPath:[^\\.]*}")
-    public String forwardNestedToAngular() {
+    /**
+     * Forward Angular routes to index.html
+     */
+    @RequestMapping(value = {
+            "/login",
+            "/dashboard",
+            "/transfer",
+            "/history",
+            "/profile"
+    })
+    public String forwardAngularRoutes() {
         return "forward:/index.html";
     }
 }
