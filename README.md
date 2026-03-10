@@ -14,11 +14,11 @@ A full-stack financial web application that allows authenticated users to secure
 
 Use the following accounts to explore the application:
 
-| Username | Password    | Role  | Account Number | Initial Balance |
-|----------|-------------|-------|----------------|-----------------|
-| `ahmed`  | `Ahmed@1234`| USER  | ACC-0000002    | $5,000.00       |
-| `sara`   | `Sara@1234` | USER  | ACC-0000003    | $3,000.00       |
-| `admin`  | `Admin@1234`| ADMIN | ACC-0000001    | $10,000.00      |
+| Username | Password     | Role  | Account Number | Initial Balance |
+|----------|--------------|-------|----------------|-----------------|
+| `ahmed`  | `ahmed@1234` | USER  | ACC-0000002    | $5,000.00       |
+| `sara`   | `sara@1234`  | USER  | ACC-0000003    | $3,000.00       |
+| `admin`  | `admin@1234` | ADMIN | ACC-0000001    | $10,000.00      |
 
 > **Tip for testing:** Log in as `ahmed`, transfer funds to `ACC-0000003`, then log in as `sara` to see the received transaction appear in her history.
 
