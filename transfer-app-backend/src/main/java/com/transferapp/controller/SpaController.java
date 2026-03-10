@@ -1,24 +1,20 @@
-package com.transferapp.controller;
+package com.transferapp.config;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-/**
- * Handles Angular client-side routing in a single-JAR deployment
- */
 @Controller
 public class SpaController {
 
     /**
-     * Forward Angular routes to index.html
+     * Forwards Angular routes to index.html.
+     *
      */
-    @RequestMapping(value = {
-            "/login",
-            "/dashboard",
-            "/transfer",
-            "/history",
-            "/profile"
-    })
+    @RequestMapping(
+            method  = RequestMethod.GET,
+            value   = { "/login", "/dashboard", "/transfer", "/history", "/profile" }
+    )
     public String forwardAngularRoutes() {
         return "forward:/index.html";
     }
