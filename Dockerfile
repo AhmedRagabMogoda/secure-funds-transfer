@@ -36,7 +36,7 @@ RUN npm ci --legacy-peer-deps
 COPY transfer-app-frontend/ ./
 
 # Build for production
-# Output goes to: dist/transfer-app-frontend/browser/
+# Output goes to: dist/transfer-app-frontend/
 RUN npm run build:prod
 
 
