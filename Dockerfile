@@ -3,12 +3,12 @@
 #
 # Structure expected:
 #   project-root/
-#   ├── Dockerfile          ← this file
-#   ├── frontend/           ← Angular project
+#   ├── Dockerfile                  ← this file
+#   ├── transfer-app-frontend/      ← Angular project
 #   │   ├── package.json
 #   │   ├── angular.json
 #   │   └── src/
-#   └── backend/            ← Spring Boot project
+#   └── transfer-app-backend/       ← Spring Boot project
 #       ├── pom.xml
 #       └── src/
 #
@@ -28,12 +28,12 @@ WORKDIR /frontend
 
 # Copy manifests first — Docker caches this layer until
 # package.json or package-lock.json changes
-COPY frontend/package*.json ./
+COPY transfer-app-frontend/package*.json ./
 
 RUN npm ci --legacy-peer-deps
 
 # Copy full frontend source
-COPY frontend/ ./
+COPY transfer-app-frontend/ ./
 
 # Build for production
 # Output goes to: dist/transfer-app-frontend/browser/
@@ -48,7 +48,7 @@ FROM maven:3.9.6-eclipse-temurin-17 AS backend-builder
 WORKDIR /backend
 
 # Copy pom.xml and resolve dependencies first (cached layer)
-COPY backend/pom.xml ./
+COPY transfer-app-backend/pom.xml ./
 RUN mvn dependency:go-offline -B
 
 # Copy Angular compiled output into Spring Boot static resources
@@ -59,7 +59,7 @@ COPY --from=frontend-builder \
      src/main/resources/static/
 
 # Copy backend source
-COPY backend/src ./src
+COPY transfer-app-backend/src ./src
 
 # Build the JAR — static files are now inside BOOT-INF/classes/static/
 RUN mvn clean package -DskipTests -B
@@ -83,6 +83,7 @@ RUN chown appuser:appgroup app.jar
 
 USER appuser
 
+# Railway sets PORT automatically — Spring Boot reads it via ${PORT:8080}
 EXPOSE 8080
 
 ENTRYPOINT ["java", \
