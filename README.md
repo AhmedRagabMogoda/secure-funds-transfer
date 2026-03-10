@@ -6,8 +6,7 @@ A full-stack financial web application that allows authenticated users to secure
 
 ## Live Demo
 
-> **Frontend:** [https://your-app.vercel.app](https://your-app.vercel.app)  
-> **Backend API:** [https://your-api.onrender.com](https://your-api.onrender.com)
+> **Live Demo Link:** [https://secure-funds-transfer-production.up.railway.app]
 
 *Replace the above URLs with your actual deployed URLs before submission.*
 
@@ -119,7 +118,7 @@ secure-funds-transfer/
 | GET    | `/api/transfers/history/received` | Required | Received transactions only (paginated) |
 | GET    | `/api/users/profile`              | Required | Full profile with transaction stats  |
 
-> For full request/response examples, see [API_DOCUMENTATION.md](./API_DOCUMENTATION.md).
+> For full request/response examples, see [API_DOCUMENTATION.md](https://github.com/AhmedRagabMogoda/secure-funds-transfer/blob/master/docs/API_DOCUMENTATION.md).
 
 ---
 
@@ -153,13 +152,6 @@ docker compose up --build
 
 Docker will build both images and start PostgreSQL, the Spring Boot backend, and the Nginx frontend in the correct dependency order. On first run this takes approximately 3–5 minutes.
 
-**Step 4 — Access the application:**
-
-| Service  | URL                          |
-|----------|------------------------------|
-| Frontend | http://localhost             |
-| Backend  | http://localhost:8080        |
-| Database | localhost:5432               |
 
 **To stop:**
 ```bash
