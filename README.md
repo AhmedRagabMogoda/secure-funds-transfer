@@ -8,8 +8,6 @@ A full-stack financial web application that allows authenticated users to secure
 
 > **Live Demo Link:** [https://secure-funds-transfer-production.up.railway.app]
 
-*Replace the above URLs with your actual deployed URLs before submission.*
-
 ---
 
 ## Sample Credentials
@@ -60,17 +58,16 @@ Use the following accounts to explore the application:
 
 ```
 secure-funds-transfer/
-├── docker-compose.yml
+├── Dockerfile
 ├── .env.example
 ├── API_DOCUMENTATION.md
 │
 ├── transfer-app-backend/
-│   ├── Dockerfile
 │   ├── pom.xml
 │   └── src/main/
 │       ├── java/com/transferapp/
 │       │   ├── controller/     AuthController, AccountController,
-│       │   │                   TransferController, UserController
+│       │   │                   TransferController, UserController, SpaController
 │       │   ├── service/        AuthService, AccountService,
 │       │   │                   TransferService, UserService
 │       │   ├── repository/     UserRepository, AccountRepository,
@@ -79,19 +76,17 @@ secure-funds-transfer/
 │       │   ├── dto/            LoginRequest, AuthResponse,
 │       │   │                   TransferRequest, TransferResponse,
 │       │   │                   TransactionResponse, AccountResponse,
-│       │   │                   UserProfileResponse, PagedResponse
+│       │   │                   UserProfileResponse, PagedResponse ,ApiResponse
 │       │   ├── security/       JwtService, JwtAuthenticationFilter,
 │       │   │                   SecurityConfig
 │       │   ├── config/         ApplicationConfig
 │       │   ├── exception/      GlobalExceptionHandler
-│       │   ├── response/       ApiResponse
 │       │   └── enums/          Role
 │       └── resources/
 │           ├── application.yml
 │           └── db/migration/   V1–V4 Flyway SQL scripts
 │
 └── transfer-app-frontend/
-    ├── Dockerfile
     ├── nginx.conf
     └── src/app/
         ├── core/       AuthService, JwtInterceptor,
@@ -122,58 +117,141 @@ secure-funds-transfer/
 
 ---
 
-## Local Setup — Option A: Docker Compose (Recommended)
+---
 
-This is the fastest way to run the full stack locally with a single command.
+# Local Setup — Option A: Docker (Single Container)
 
-**Prerequisites:** Docker Desktop installed and running.
+This project uses a **single multi-stage Dockerfile** that:
 
-**Step 1 — Clone the repository:**
+1. Builds the Angular frontend
+2. Embeds the compiled frontend into the Spring Boot static resources
+3. Builds the Spring Boot JAR
+4. Runs the application in a lightweight runtime container
+
+This approach ensures that the **frontend and backend are deployed together as a single service**, which simplifies deployment on platforms such as Railway.
+
+---
+
+## Prerequisites
+
+* Docker Desktop installed and running
+
+Verify installation:
+
+```bash
+docker --version
+```
+
+---
+
+## Step 1 — Clone the repository
+
 ```bash
 git clone https://github.com/your-username/secure-funds-transfer.git
 cd secure-funds-transfer
 ```
 
-**Step 2 — Create your environment file:**
+---
+
+## Step 2 — Create your environment file
+
 ```bash
 cp .env.example .env
 ```
 
-Open `.env` and set your values. For a quick local run, the defaults work as-is. For a real deployment, replace `JWT_SECRET` with a strong Base64-encoded secret:
+Open `.env` and set your values.
+
+For production deployments, generate a strong JWT secret:
+
 ```bash
-# Generate a secure JWT secret (Linux/macOS)
 openssl rand -base64 32
 ```
 
-**Step 3 — Build and start all services:**
-```bash
-docker compose up --build
-```
+Example `.env` values:
 
-Docker will build both images and start PostgreSQL, the Spring Boot backend, and the Nginx frontend in the correct dependency order. On first run this takes approximately 3–5 minutes.
-
-
-**To stop:**
-```bash
-docker compose down          # stop containers, keep data
-docker compose down -v       # stop containers, delete database volume
+```env
+DB_URL=jdbc:postgresql://localhost:5432/transfer_db
+DB_USERNAME=transfer_user
+DB_PASSWORD=your_password
+JWT_SECRET=your_generated_secret
+JWT_EXPIRATION=900000
+REFRESH_TOKEN_EXPIRATION=604800000
 ```
 
 ---
 
-## Local Setup — Option B: Manual (Without Docker)
+## Step 3 — Build the Docker image
+
+From the project root directory:
+
+```bash
+docker build -t secure-funds-transfer .
+```
+
+During the build process Docker will:
+
+1. Install frontend dependencies
+2. Build the Angular production bundle
+3. Copy the compiled frontend into Spring Boot `static` resources
+4. Build the Spring Boot JAR
+5. Produce a lightweight runtime image
+
+The first build usually takes **3–5 minutes**.
+
+---
+
+## Step 4 — Run the application
+
+```bash
+docker run -p 8080:8080 --env-file .env secure-funds-transfer
+```
+
+The application will start on:
+
+```
+http://localhost:8080
+```
+
+The Angular frontend is served directly by Spring Boot, and all API endpoints are available under:
+
+```
+http://localhost:8080/api/*
+```
+
+---
+
+## Stop the container
+
+Press:
+
+```
+CTRL + C
+```
+
+Or stop it from another terminal:
+
+```bash
+docker ps
+docker stop <container_id>
+```
+
+---
+
+# Local Setup — Option B: Manual (Without Docker)
 
 Use this approach if you want to run the services directly for active development.
 
 ### Prerequisites
 
-- Java 17 (verify: `java -version`)
-- Maven 3.9+ (verify: `mvn -version`)
-- Node.js 20+ and npm (verify: `node -v`)
-- Angular CLI 17: `npm install -g @angular/cli`
-- PostgreSQL 15+ running locally
+* Java 17 (verify: `java -version`)
+* Maven 3.9+ (verify: `mvn -version`)
+* Node.js 20+ and npm (verify: `node -v`)
+* Angular CLI 17: `npm install -g @angular/cli`
+* PostgreSQL 15+ running locally
 
-### Database Setup
+---
+
+## Database Setup
 
 Connect to your PostgreSQL instance and create the database and user:
 
@@ -185,16 +263,20 @@ GRANT ALL PRIVILEGES ON DATABASE transfer_db TO transfer_user;
 
 Flyway will automatically run the migration scripts (`V1` through `V4`) on the first backend startup and seed the sample users.
 
-### Backend Setup
+---
 
-**Step 1 — Navigate to the backend directory:**
+## Backend Setup
+
+Navigate to the backend directory:
+
 ```bash
-cd transfer-app-backend
+cd backend
 ```
 
-**Step 2 — Set environment variables:**
+Set environment variables.
 
-On Linux/macOS:
+Linux/macOS:
+
 ```bash
 export DB_URL=jdbc:postgresql://localhost:5432/transfer_db
 export DB_USERNAME=transfer_user
@@ -204,54 +286,65 @@ export JWT_EXPIRATION=900000
 export REFRESH_TOKEN_EXPIRATION=604800000
 ```
 
-On Windows (PowerShell):
+Windows (PowerShell):
+
 ```powershell
 $env:DB_URL = "jdbc:postgresql://localhost:5432/transfer_db"
 $env:DB_USERNAME = "transfer_user"
 $env:DB_PASSWORD = "your_password"
-$env:JWT_SECRET = "bXlTdXBlclNlY3JldEtleUZvckpXVEF1dGhlbnRpY2F0aW9u"
+$env:JWT_SECRET = "your_generated_secret"
 $env:JWT_EXPIRATION = "900000"
 $env:REFRESH_TOKEN_EXPIRATION = "604800000"
 ```
 
-**Step 3 — Build and run:**
+Build and run the backend:
+
 ```bash
 mvn clean package -DskipTests
 mvn spring-boot:run
 ```
 
-The backend starts on `http://localhost:8080`. You should see Flyway output confirming that the migrations ran successfully.
+The backend starts on:
 
-**To verify it is running:**
-```bash
-curl http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"ahmed","password":"Ahmed@1234"}'
+```
+http://localhost:8080
 ```
 
-### Frontend Setup
+---
 
-**Step 1 — Navigate to the frontend directory:**
+## Frontend Setup (Development Mode)
+
+Navigate to the frontend directory:
+
 ```bash
-cd transfer-app-frontend
+cd frontend
 ```
 
-**Step 2 — Install dependencies:**
+Install dependencies:
+
 ```bash
 npm install --legacy-peer-deps
 ```
 
-**Step 3 — Start the development server:**
+Start the Angular development server:
+
 ```bash
 ng serve
 ```
 
-The Angular dev server starts on `http://localhost:4200`. The `proxy.conf.json` file automatically proxies all `/api/*` requests to `http://localhost:8080`, so no CORS configuration is needed.
+The frontend will run on:
 
-**Step 4 — Open your browser:**
 ```
 http://localhost:4200
 ```
+
+The `proxy.conf.json` configuration automatically forwards `/api/*` requests to:
+
+```
+http://localhost:8080
+```
+
+---
 
 Log in with any of the sample credentials listed above.
 
@@ -307,9 +400,3 @@ User never sees the session expire
 **Refresh race condition prevention** — The `JwtInterceptor` uses a `BehaviorSubject` to gate concurrent requests during a token refresh. Only one refresh call is made; all other requests queue behind it and are replayed with the new token once it arrives.
 
 ---
-
-## Deployment Notes
-
-When deploying to cloud platforms, provide all environment variables listed above through the platform's secret management interface (Render environment variables, Railway variables, etc.). Never commit a `.env` file containing real credentials to version control.
-
-Update the CORS allowed origins in `SecurityConfig.java` to include your actual deployed frontend URL before building the production image.
