@@ -2,6 +2,7 @@ package com.transferapp.security;
 
 import com.transferapp.util.Security;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -41,7 +42,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    AuthenticationProvider authProvider) throws Exception {
-
         http
                 /** Disable CSRF for REST APIs */
                 .csrf(AbstractHttpConfigurer::disable)
@@ -52,7 +52,17 @@ public class SecurityConfig {
                 /** Authorization rules */
                 .authorizeHttpRequests(auth -> auth
 
-                        /** Angular static files */
+                        /**
+                         * Angular static files — uses PathRequest to cover ALL static
+                         * resources including hashed filenames like main.94494d70d6223869.js
+                         * that would be blocked by a plain "/*.js" pattern matcher.
+                         */
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+
+                        /**
+                         * Explicit static file patterns as a fallback for any files
+                         * not covered by the common locations above.
+                         */
                         .requestMatchers(
                                 "/",
                                 "/index.html",
@@ -63,7 +73,19 @@ public class SecurityConfig {
                                 "/*.css",
                                 "/*.ico",
                                 "/*.json",
-                                "/*.map"
+                                "/*.map",
+                                "/*.txt",
+                                "/*.woff",
+                                "/*.woff2"
+                        ).permitAll()
+
+                        /** Angular client-side routes */
+                        .requestMatchers(
+                                "/login",
+                                "/dashboard",
+                                "/transfer",
+                                "/history",
+                                "/profile"
                         ).permitAll()
 
                         /** Public authentication APIs */
@@ -131,7 +153,8 @@ public class SecurityConfig {
 
         config.setAllowedOrigins(List.of(
                 "http://localhost:4200",
-                "http://localhost:8080"
+                "http://localhost:8080",
+                "https://secure-funds-transfer-production.up.railway.app"
         ));
 
         config.setAllowedMethods(List.of(
