@@ -42,19 +42,23 @@ public class SecurityConfig {
     private static final String[] STATIC_RESOURCES = {
             "/",
             "/index.html",
+            "/favicon.ico",
+
             "/login",
             "/dashboard",
             "/transfer",
             "/history",
             "/profile",
-            "/*.js",
-            "/*.css",
-            "/*.ico",
-            "/*.json",
-            "/*.txt",
-            "/*.map",
+
             "/assets/**",
-            "/media/**"
+            "/media/**",
+
+            "/**/*.js",
+            "/**/*.css",
+            "/**/*.ico",
+            "/**/*.json",
+            "/**/*.txt",
+            "/**/*.map"
     };
 
     @Bean
