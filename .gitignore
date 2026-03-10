@@ -15,7 +15,6 @@ hs_err_pid*
 !**/src/test/**/target/
 
 # ── Spring Boot ───────────────────────────────────────────────
-application-prod.yml
 application-dev.yml
 
 # ── Node / Angular ────────────────────────────────────────────
