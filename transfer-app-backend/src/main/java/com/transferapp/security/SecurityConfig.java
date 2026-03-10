@@ -59,11 +59,11 @@ public class SecurityConfig {
                                 "/favicon.ico",
                                 "/assets/**",
                                 "/media/**",
-                                "/**/*.js",
-                                "/**/*.css",
-                                "/**/*.ico",
-                                "/**/*.json",
-                                "/**/*.map"
+                                "/*.js",
+                                "/*.css",
+                                "/*.ico",
+                                "/*.json",
+                                "/*.map"
                         ).permitAll()
 
                         /** Public authentication APIs */
